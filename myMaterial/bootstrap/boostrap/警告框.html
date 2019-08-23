@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<link href="css/bootstrap.css" rel="stylesheet" />
+	<body>
+		<button>按钮</button>
+		
+		
+		
+	</body>
+	<script src="js/jquery-1.11.0.js"></script>
+	<script src="js/bootstrap.js"></script>
+	<script src="js/message.js"></script>
+	<script>
+		$("button").click(function(){
+			$.alert({
+				content: '<div>请输入用户名</div>',
+				time: 2000,
+			});
+		})
+//		$.alert({
+//			content: '<div>请输入密码</div>'
+//		});
+//		$(".close").click(function(){
+//			$(".alert").alert('close')
+//		})
+	</script>
+</html>

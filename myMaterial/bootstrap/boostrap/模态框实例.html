@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title></title>
+	</head>
+	<link href="css/bootstrap.css" rel="stylesheet" />
+	<style>
+		.yc114-btn {
+			margin: 10px 0;
+		}
+		.hidden {
+			display: none;
+		}
+		.alert {
+			z-index: 99999;
+			position: relative;
+		}
+	</style>
+	<body>
+		<div class="yc114-btn">
+			<button class="btn btn-primary add-table-data"  id="addTableData">新增</button>
+		</div>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>姓名</th>
+					<th>性别</th>
+					<th>年龄</th>
+					<th>爱好</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+			
+		</table>
+		
+		<div class="modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<span class="close" data-dismiss="modal">
+							<i>X</i>
+						</span>
+						<div class="modal-title">新增</div>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<span class="control-label col-sm-2 col-xs-2">姓名</span>
+								<div class="col-sm-10 col-xs-10">
+									<input class="form-control" name="username" type="text" />
+								</div>
+							</div>
+							<div class="form-group">
+								<span class="control-label col-sm-2 col-xs-2">性别</span>
+								<div class="col-sm-10 col-xs-10">
+									<input class="form-control" name="sex" type="text" />
+								</div>
+							</div>
+							<div class="form-group">
+								<span class="control-label col-sm-2 col-xs-2">年龄</span>
+								<div class="col-sm-10 col-xs-10">
+									<input class="form-control" name="age" type="text" />
+								</div>
+							</div>
+							<div class="form-group">
+								<span class="control-label col-sm-2 col-xs-2">爱好</span>
+								<div class="col-sm-10 col-xs-10">
+									<input class="form-control" name="hobby" type="text" />
+								</div>
+							</div>
+						</form>
+						
+					</div>
+					<div class="modal-footer">
+						<a class="btn btn-default">取消</a>
+						<a class="btn btn-success form-submit">确定</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!--警告框-->
+		<div class="alert alert-danger hidden">请输入完整信息</div>
+		
+		<!--渲染数据使用-->
+		<script src="js/template.js"></script>
+		<script type="text/html" id="table">
+			{{each studentInfo as student index}}
+			<tr>
+				<td>{{student.name}}</td>
+				<td>{{student.sex}}</td>
+				<td>{{student.age}}</td>
+				<td>{{student.hobby}}</td>
+				<td><a class="btn btn-primary edit" data-index="{{index}}">修改</a> <a data-index="{{index}}" data-id="{{student.id}}" class="btn btn-danger delete">删除</a></td>
+			</tr>
+			{{/each}}
+		</script>	
+		
+	</body>
+	<script src="js/jquery-1.11.0.js"></script>
+	<script src="js/bootstrap.js"></script>
+	<script>
+		//文档加载完成动作
+		$(function(){
+			//渲染表格的数据
+			let id = 2;
+			let index = null;
+			let obj = {
+				studentInfo: [{
+					id: 1,
+					name: '陈天翔',
+					sex: '男',
+					age: '22',
+					hobby: '上网'
+				},{
+					id: 2,
+					name: '刘璐',
+					sex: '女',
+					age: '22',
+					hobby: '运动'
+				}]
+			}
+			
+			//渲染html
+			let html = template("table", obj);
+			$(".table").find('tbody').html(html)
+			
+			
+			$(".modal").on('show.bs.modal', function(){
+				$("[name=username]").val('');
+				$("[name=sex]").val('');
+				$("[name=age]").val('');
+				$("[name=hobby]").val('');
+			})
+			//新增
+			$(".add-table-data").click(function(){
+				//显示弹窗
+				$(".modal").modal('show');
+				
+				$(".modal-title").html("新增");
+				index = null
+			})
+			
+			//点击确定往表格里面添加数据
+			$(".form-submit").click(function(){
+				
+				//拿到添加的数据
+				let username = $("[name=username]").val();
+				let sex = $("[name=sex]").val();
+				let age = $("[name=age]").val();
+				let hobby = $("[name=hobby]").val();
+				
+				//判断数据是否完整
+				if(!username || !sex || !age ||!hobby) {
+					
+					$(".alert").removeClass('hidden')
+					setTimeout(function(){
+						$(".alert").addClass('hidden')
+					}, 2000)
+				}
+				
+				//index 存在表示修改  不存在表示添加
+				if(index || index == 0) {
+					console.log('打印当前数据')
+					console.log(obj.studentInfo[index])
+					
+					obj.studentInfo[index].name = username;
+					obj.studentInfo[index].age = age;
+					obj.studentInfo[index].sex = sex;
+					obj.studentInfo[index].hobby = hobby;
+					
+				}else {
+					let stuObj = {
+						id: ++id,
+						name: username,
+						sex: sex,
+						age: age,
+						hobby: hobby
+					}
+					obj.studentInfo.push(stuObj);
+				}
+
+				//将获取的数据追加到页面上
+//				let html = template("table", {
+//					studentInfo: [stuObj]
+//				});
+				let html = template("table", obj);
+				$(".table").find('tbody').html(html)
+				console.log(index)				
+				//关闭弹出
+				$(".modal").modal('hide');
+				
+			})
+			
+			//删除
+			$(".table").on('click', '.delete', function(){
+				//data-id 数据缓存 获取存到元素上的id
+				let id = $(this).data('id');
+				let index = $(this).data('index');
+				//找到父级tr并删除
+				//$(this).closest('tr').remove();
+				//删除选择出来的数据
+				obj.studentInfo.splice(index, 1);
+				
+				let html = template("table", obj);
+				$(".table").find('tbody').html(html)
+				
+			})
+			
+			//添加
+			$(".table").on('click', '.edit', function(){
+				//打开弹窗
+				$(".modal").modal("show");
+				//改变title
+				$(".modal-title").html("编辑");
+				
+				//获取当前点击的index
+				let curIndex = $(this).data('index');
+				index = curIndex;
+				
+				let data = obj.studentInfo[curIndex]
+
+				//将获取出的信息填入表单中
+				$("[name=username]").val(data.name);
+				$("[name=sex]").val(data.sex);
+				$("[name=age]").val(data.age);
+				$("[name=hobby]").val(data.hobby);
+				
+			})
+		})
+	</script>
+</html>
+				
